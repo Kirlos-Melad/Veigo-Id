@@ -1,8 +1,9 @@
+use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, sync::Mutex};
 
 use super::StateBackend;
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct MemoryState {
     last_ts: Mutex<u128>,
     counters: Mutex<HashMap<u128, u128>>,
@@ -18,10 +19,10 @@ impl MemoryState {
 }
 
 impl StateBackend for MemoryState {
-    fn get_last_ts(&self) -> u128 {
+    fn get_last_timestamp(&self) -> u128 {
         *self.last_ts.lock().unwrap()
     }
-    fn set_last_ts(&self, ts: u128) {
+    fn set_last_timestamp(&self, ts: u128) {
         *self.last_ts.lock().unwrap() = ts;
     }
 

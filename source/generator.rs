@@ -20,7 +20,10 @@ impl<B: StateBackend> VeigoId<B> {
     pub fn new(config: Option<VeigoConfig>, backend: Arc<B>) -> Result<Self, VeigoIdError> {
         let cfg = config.unwrap_or_default();
         cfg.validate()?;
-        Ok(Self { config: cfg, state: backend })
+        Ok(Self {
+            config: cfg,
+            state: backend,
+        })
     }
 
     fn current_seconds(&self) -> u128 {
@@ -40,22 +43,25 @@ impl<B: StateBackend> VeigoId<B> {
         }
 
         let ts = self.current_seconds();
-        if ts > self.config.max_ts() {
+        if ts > self.config.max_timestamp() {
             return Err(VeigoIdError::FieldOverflow {
                 field: "timestamp",
                 value: ts,
-                max: self.config.max_ts(),
+                max: self.config.max_timestamp(),
             });
         }
 
-        let last_ts = self.state.get_last_ts();
+        let last_ts = self.state.get_last_timestamp();
         if ts < last_ts {
-            return Err(VeigoIdError::ClockSkew { now: ts, last: last_ts });
+            return Err(VeigoIdError::ClockSkew {
+                now: ts,
+                last: last_ts,
+            });
         }
 
         if ts != last_ts {
             self.state.clear_counters();
-            self.state.set_last_ts(ts);
+            self.state.set_last_timestamp(ts);
         }
 
         let mut counter = self.state.get_counter(context);
@@ -85,7 +91,10 @@ impl<B: StateBackend> VeigoId<B> {
         let context = (id >> self.config.counter_bits) & context_mask;
         let timestamp = id >> (self.config.context_bits + self.config.counter_bits);
 
-        VeigoIdParts { timestamp, context, counter }
+        VeigoIdParts {
+            timestamp,
+            context,
+            counter,
+        }
     }
 }
-
