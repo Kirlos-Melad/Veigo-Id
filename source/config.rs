@@ -1,9 +1,10 @@
 use chrono::DateTime;
+use serde::{Deserialize, Serialize};
 use std::time::SystemTime;
 
 use crate::errors::VeigoIdError;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VeigoConfig {
     pub timestamp_bits: u8,
     pub context_bits: u8,
@@ -25,7 +26,8 @@ impl Default for VeigoConfig {
 
 impl VeigoConfig {
     pub fn validate(&self) -> Result<(), VeigoIdError> {
-        let total = 1 + self.timestamp_bits as u16 + self.context_bits as u16 + self.counter_bits as u16;
+        let total =
+            1 + self.timestamp_bits as u16 + self.context_bits as u16 + self.counter_bits as u16;
         if total > 128 {
             return Err(VeigoIdError::InvalidConfig(
                 "total bits must be ≤ 128 including sign",

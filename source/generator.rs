@@ -11,12 +11,12 @@ pub struct VeigoIdParts {
 }
 
 #[derive(Debug, Clone)]
-pub struct VeigoId<B: StateBackend> {
+pub struct VeigoIdGenerator<B: StateBackend> {
     config: VeigoConfig,
     state: Arc<B>,
 }
 
-impl<B: StateBackend> VeigoId<B> {
+impl<B: StateBackend> VeigoIdGenerator<B> {
     pub fn new(config: Option<VeigoConfig>, backend: Arc<B>) -> Result<Self, VeigoIdError> {
         let cfg = config.unwrap_or_default();
         cfg.validate()?;

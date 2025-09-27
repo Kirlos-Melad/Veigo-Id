@@ -28,11 +28,11 @@ veigo-id = { git = "https://github.com/Kirlos-Melad/Veigo-Id.git" }
 
 ```rust
 use std::sync::Arc;
-use veigo_id::{MemoryState, VeigoId};
+use veigo_id::{MemoryState, VeigoIdGenerator};
 
 fn main() {
     let backend = Arc::new(MemoryState::new());
-    let generator = VeigoId::new(None, backend).unwrap();
+    let generator = VeigoIdGenerator::new(None, backend).unwrap();
 
     // Generate a new ID with a context
     let context = 42u128;
