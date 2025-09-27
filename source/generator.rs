@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::time::SystemTime;
 
-use crate::{backend::StateBackend, config::VeigoConfig, errors::VeigoIdError};
+use crate::{backend::StateBackend, config::VeigoConfig, errors::VeigoIdError, id::VeigoId};
 
 #[derive(Debug)]
 pub struct VeigoIdParts {
@@ -33,7 +33,7 @@ impl<B: StateBackend> VeigoIdGenerator<B> {
             .as_secs() as u128
     }
 
-    pub fn generate(&self, context: u128) -> Result<u128, VeigoIdError> {
+    pub fn generate(&self, context: u128) -> Result<VeigoId, VeigoIdError> {
         if context > self.config.max_context() {
             return Err(VeigoIdError::FieldOverflow {
                 field: "context",
@@ -80,10 +80,11 @@ impl<B: StateBackend> VeigoIdGenerator<B> {
         counter += 1;
         self.state.set_counter(context, counter);
 
-        Ok(id)
+        Ok(VeigoId::from(id))
     }
 
-    pub fn decode(&self, id: u128) -> VeigoIdParts {
+    pub fn decode(&self, id: VeigoId) -> VeigoIdParts {
+        let id: u128 = id.into();
         let counter_mask = (1u128 << self.config.counter_bits) - 1;
         let context_mask = (1u128 << self.config.context_bits) - 1;
 
@@ -98,3 +99,4 @@ impl<B: StateBackend> VeigoIdGenerator<B> {
         }
     }
 }
+
