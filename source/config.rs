@@ -29,7 +29,7 @@ impl VeigoConfig {
         let total =
             1 + self.timestamp_bits as u16 + self.context_bits as u16 + self.counter_bits as u16;
         if total > 128 {
-            return Err(VeigoIdError::InvalidConfig(
+            return Err(VeigoIdError::InvalidConfiguration(
                 "total bits must be ≤ 128 including sign",
             ));
         }

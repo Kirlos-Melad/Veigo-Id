@@ -1,6 +1,6 @@
-pub mod memory_backend;
+pub mod in_memory;
 
-pub trait StateBackend: Send + Sync + 'static {
+pub trait StateBackend: Send + Sync + std::fmt::Debug + 'static {
     fn get_last_timestamp(&self) -> u128;
     fn set_last_timestamp(&self, ts: u128);
 

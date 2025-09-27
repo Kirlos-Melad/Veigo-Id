@@ -12,6 +12,18 @@ pub enum VeigoIdError {
         max: u128,
     },
 
-    #[error("invalid configuration: {0}")]
-    InvalidConfig(&'static str),
+    #[error("Generator already configured")]
+    AlreadyConfigured,
+
+    #[error("Generator not configured")]
+    NotConfigured,
+
+    #[error("Generator lock poisoned")]
+    Poisoned,
+
+    #[error("Invalid configuration: {0}")]
+    InvalidConfiguration(&'static str),
+
+    #[error("Backend error: {0}")]
+    Backend(String),
 }

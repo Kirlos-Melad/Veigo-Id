@@ -1,11 +1,15 @@
-pub mod backend;
-pub mod config;
-pub mod errors;
-pub mod generator;
-pub mod id;
+mod backend;
+mod config;
+mod errors;
+mod generator;
+mod id;
+mod registry;
 
-pub use backend::*;
-pub use config::*;
-pub use errors::*;
-pub use generator::*;
-pub use id::*;
+pub use config::VeigoConfig;
+pub use errors::VeigoIdError;
+pub use id::VeigoId;
+
+pub use backend::StateBackend;
+pub use backend::in_memory::InMemoryBackend;
+
+pub use registry::configure;

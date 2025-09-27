@@ -11,19 +11,15 @@ pub struct VeigoIdParts {
 }
 
 #[derive(Debug, Clone)]
-pub struct VeigoIdGenerator<B: StateBackend> {
+pub struct VeigoIdGenerator {
+    backend: Arc<dyn StateBackend>,
     config: VeigoConfig,
-    state: Arc<B>,
 }
 
-impl<B: StateBackend> VeigoIdGenerator<B> {
-    pub fn new(config: Option<VeigoConfig>, backend: Arc<B>) -> Result<Self, VeigoIdError> {
-        let cfg = config.unwrap_or_default();
-        cfg.validate()?;
-        Ok(Self {
-            config: cfg,
-            state: backend,
-        })
+impl VeigoIdGenerator {
+    pub fn new(config: VeigoConfig, backend: Arc<dyn StateBackend>) -> Result<Self, VeigoIdError> {
+        config.validate()?;
+        Ok(Self { backend, config })
     }
 
     fn current_seconds(&self) -> u128 {
@@ -51,7 +47,7 @@ impl<B: StateBackend> VeigoIdGenerator<B> {
             });
         }
 
-        let last_ts = self.state.get_last_timestamp();
+        let last_ts = self.backend.get_last_timestamp();
         if ts < last_ts {
             return Err(VeigoIdError::ClockSkew {
                 now: ts,
@@ -60,11 +56,11 @@ impl<B: StateBackend> VeigoIdGenerator<B> {
         }
 
         if ts != last_ts {
-            self.state.clear_counters();
-            self.state.set_last_timestamp(ts);
+            self.backend.clear_counters();
+            self.backend.set_last_timestamp(ts);
         }
 
-        let mut counter = self.state.get_counter(context);
+        let mut counter = self.backend.get_counter(context);
         if counter > self.config.max_counter() {
             return Err(VeigoIdError::FieldOverflow {
                 field: "counter",
@@ -78,7 +74,7 @@ impl<B: StateBackend> VeigoIdGenerator<B> {
             | counter;
 
         counter += 1;
-        self.state.set_counter(context, counter);
+        self.backend.set_counter(context, counter);
 
         Ok(VeigoId::from(id))
     }
@@ -99,4 +95,3 @@ impl<B: StateBackend> VeigoIdGenerator<B> {
         }
     }
 }
-

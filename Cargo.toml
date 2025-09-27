@@ -11,5 +11,6 @@ path = "source/lib.rs"
 
 [dependencies]
 chrono = "0.4.42"
+once_cell = "1.21.3"
 serde = { version = "1.0.227", features = ["derive"] }
 thiserror = "2.0.16"
